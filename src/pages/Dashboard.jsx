@@ -4,11 +4,21 @@ const Dashboard = () => {
     const [destinations, setDestinations] = useState([]);
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
+    const [editIndex, setEditIndex] = useState(null); // Para saber si estamos editando
 
-    const handleAddDestination = (e) => {
+    const handleAddOrUpdateDestination = (e) => {
         e.preventDefault();
-        const newDestination = { name, description };
-        setDestinations([...destinations, newDestination]);
+        if (editIndex !== null) {
+            // Actualizar el destino
+            const updatedDestinations = [...destinations];
+            updatedDestinations[editIndex] = { name, description };
+            setDestinations(updatedDestinations);
+            setEditIndex(null);
+        } else {
+            // Agregar nuevo destino
+            const newDestination = { name, description };
+            setDestinations([...destinations, newDestination]);
+        }
         setName('');
         setDescription('');
     };
@@ -18,10 +28,16 @@ const Dashboard = () => {
         setDestinations(updatedDestinations);
     };
 
+    const handleEditDestination = (index) => {
+        setEditIndex(index);
+        setName(destinations[index].name);
+        setDescription(destinations[index].description);
+    };
+
     return (
         <div style={{ padding: '20px' }}>
             <h2>Dashboard</h2>
-            <form onSubmit={handleAddDestination}>
+            <form onSubmit={handleAddOrUpdateDestination}>
                 <div>
                     <label htmlFor="name">Nombre del Destino:</label>
                     <input
@@ -41,13 +57,14 @@ const Dashboard = () => {
                         required
                     />
                 </div>
-                <button type="submit">Agregar Destino</button>
+                <button type="submit">{editIndex !== null ? 'Actualizar Destino' : 'Agregar Destino'}</button>
             </form>
             <h3>Destinos Agregados</h3>
             <ul>
                 {destinations.map((destination, index) => (
                     <li key={index}>
                         <strong>{destination.name}</strong>: {destination.description}
+                        <button onClick={() => handleEditDestination(index)}>Editar</button>
                         <button onClick={() => handleDeleteDestination(index)}>Eliminar</button>
                     </li>
                 ))}
